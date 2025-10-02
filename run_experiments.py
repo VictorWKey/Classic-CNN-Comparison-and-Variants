@@ -4,7 +4,33 @@ Script principal para ejecutar todos los experimentos de comparación de CNNs
 """
 
 import os
+import sys
 import subprocess
+from pathlib import Path
+
+def download_cifar10():
+    """Descarga CIFAR10 en la carpeta data/ si no existe"""
+    import torchvision
+    import torchvision.transforms as transforms
+
+    data_dir = "data"
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+
+    print("Descargando CIFAR10 en carpeta 'data/'...")
+    torchvision.datasets.CIFAR10(
+        root=data_dir,
+        train=True,
+        download=True,
+        transform=transforms.ToTensor()
+    )
+    torchvision.datasets.CIFAR10(
+        root=data_dir,
+        train=False,
+        download=True,
+        transform=transforms.ToTensor()
+    )
+    print("✅ CIFAR10 disponible en carpeta 'data/'")
 
 def run_notebook(notebook_path):
     """Ejecuta un notebook de Jupyter"""
@@ -37,6 +63,13 @@ def main():
             print(f"Creando directorio: {dir_name}")
             os.makedirs(dir_name)
     
+    # Descargar CIFAR10 si no existe dataset
+    if not os.path.exists("data") or not os.listdir("data"):
+        print("⚠️  No se encontraron datos en 'data/', se descargará CIFAR10...")
+        download_cifar10()
+    else:
+        print(f"Encontrados {len(os.listdir('data'))} carpetas/archivos en el dataset")
+
     # Lista de notebooks a ejecutar en orden
     notebooks = [
         'notebooks/01_LeNet_Training.ipynb',
@@ -44,26 +77,6 @@ def main():
         'notebooks/03_VGG16_Training.ipynb',
         'notebooks/04_Comparative_Analysis.ipynb'
     ]
-    
-    # Verificar que existen los datos o descargarlos
-    if not os.path.exists('data') or not os.listdir('data'):
-        print("⚠️  No se encontraron datos en 'data/'. Descargando CIFAR10...")
-        import torchvision
-        import torchvision.transforms as transforms
-
-        if not os.path.exists("data"):
-            os.makedirs("data")
-
-        torchvision.datasets.CIFAR10(
-            root="data", train=True, download=True, transform=transforms.ToTensor()
-        )
-        torchvision.datasets.CIFAR10(
-            root="data", train=False, download=True, transform=transforms.ToTensor()
-        )
-
-        print("✅ CIFAR10 descargado en 'data/'")
-    else:
-        print(f"Encontrados {len(os.listdir('data'))} clases en el dataset")
     
     # Ejecutar notebooks secuencialmente
     success_count = 0
