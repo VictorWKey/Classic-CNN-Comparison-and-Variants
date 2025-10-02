@@ -4,9 +4,7 @@ Script principal para ejecutar todos los experimentos de comparación de CNNs
 """
 
 import os
-import sys
 import subprocess
-from pathlib import Path
 
 def run_notebook(notebook_path):
     """Ejecuta un notebook de Jupyter"""
@@ -47,17 +45,25 @@ def main():
         'notebooks/04_Comparative_Analysis.ipynb'
     ]
     
-    # Verificar que existen los datos
+    # Verificar que existen los datos o descargarlos
     if not os.path.exists('data') or not os.listdir('data'):
-        print("⚠️  ATENCIÓN: No se encontraron datos en el directorio 'data/'")
-        print("   Asegúrate de colocar tu dataset en 'data/' con la estructura:")
-        print("   data/")
-        print("   ├── clase1/")
-        print("   ├── clase2/")
-        print("   └── ...")
-        return
-    
-    print(f"Encontrados {len(os.listdir('data'))} clases en el dataset")
+        print("⚠️  No se encontraron datos en 'data/'. Descargando CIFAR10...")
+        import torchvision
+        import torchvision.transforms as transforms
+
+        if not os.path.exists("data"):
+            os.makedirs("data")
+
+        torchvision.datasets.CIFAR10(
+            root="data", train=True, download=True, transform=transforms.ToTensor()
+        )
+        torchvision.datasets.CIFAR10(
+            root="data", train=False, download=True, transform=transforms.ToTensor()
+        )
+
+        print("✅ CIFAR10 descargado en 'data/'")
+    else:
+        print(f"Encontrados {len(os.listdir('data'))} clases en el dataset")
     
     # Ejecutar notebooks secuencialmente
     success_count = 0
