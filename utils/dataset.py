@@ -87,11 +87,6 @@ def create_data_loaders(data_dir, batch_size=64, input_size=224, train_split=0.7
 def _create_cifar10_loaders(data_dir, batch_size=64, input_size=224, train_split=0.7, val_split=0.2, seed=42):
     """Crea DataLoaders específicos para CIFAR-10"""
 
-    # Ajustar tamaño de entrada para CIFAR-10 (32x32 nativo)
-    # if input_size < 32:
-    #     input_size = 32
-    #     print(f"⚠️  Ajustando input_size a {input_size} para CIFAR-10")
-    dataset.py
     # Transformaciones optimizadas para CIFAR-10
     train_transform = transforms.Compose([
         transforms.Resize((input_size, input_size)),
